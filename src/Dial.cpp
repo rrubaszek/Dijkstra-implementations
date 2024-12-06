@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         std::cerr << "Error opening file for writing: " << res_file << std::endl;
         return 1;
     }
-
+    
     out_file << "p " << argv[0] << " " << command << "\n";
     out_file << "c wyniki testu dla sieci zadanej w pliku: " << argv[4] << "\nc i pliku ze zrodlami: " << argv[6] << "\n";
     out_file << "--------------\n";

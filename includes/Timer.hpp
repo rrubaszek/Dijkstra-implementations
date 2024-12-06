@@ -4,11 +4,11 @@
 
 class Timer 
 {
-public:
-    Timer();
-    std::chrono::duration<double> time_elapsed();
-    void reset();
-
 private:
     std::chrono::steady_clock::time_point start;
+
+public:
+    Timer();
+    void reset();
+    std::chrono::duration<double> time_elapsed();
 };

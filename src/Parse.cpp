@@ -1,11 +1,11 @@
 #include "Parse.hpp"
 
+#include <cassert>
 #include <fstream>
-#include <filesystem>
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 #include <unordered_map>
-#include <cassert>
 
 std::string Parse::find_file(const std::string& filename)
 {
@@ -57,8 +57,6 @@ std::string Parse::parse_data(const std::string& filename, Graph& g)
     }
 
     assert(V > 0 && E > 0 && weight_max > -1);
-
-    std::cout << V << " " << E << " " << weight_max << " " << weight_min << "\n";
 
     g.set_properties(V, E, weight_max, weight_min);
 

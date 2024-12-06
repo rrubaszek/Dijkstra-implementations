@@ -109,5 +109,7 @@ int main(int argc, char* argv[])
     
     out_file.close();
 
+    std::cout << time.count() << std::endl;
+
     return 0;
 }

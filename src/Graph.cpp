@@ -38,8 +38,6 @@ void Graph::add_edge(int u, int v, long long weight)
     list[u].emplace_back(v, weight);
 }
 
-void Graph::print_graph() {}
-
 std::vector<long long> Graph::dijkstra(int source)
 {
     if (source < 1 || source > V) 
@@ -54,29 +52,61 @@ std::vector<long long> Graph::dijkstra(int source)
     queue.emplace(0, source);
     distances.at(source) = 0;
     
-    long long curr_dist;
-    int curr_node;
+    long long dist;
+    int u;
     while (!queue.empty()) 
     {
-        curr_dist = queue.top().first;
-        curr_node = queue.top().second;
+        dist = queue.top().first;
+        u = queue.top().second;
 
         queue.pop();
 
-        for(const auto& [next_node, weight] : list.at(curr_node))
+        for(const auto& [v, weight] : list.at(u))
         {
-            if (curr_dist + weight < distances.at(next_node)) 
+            if (dist + weight < distances.at(v)) 
             {
-                distances.at(next_node) = curr_dist + weight;
-                assert(distances.at(next_node) > 0);
+                distances.at(v) = dist + weight;
+                assert(distances.at(v) > 0);
 
-                queue.emplace(distances.at(next_node), next_node);
+                queue.emplace(distances.at(v), v);
             }
         }
     }
 
     return distances;
 }
+
+// std::vector<long long> Graph::dial(int source)
+// {
+//     std::vector<long long> distances(V + 1, std::numeric_limits<long long>::max());
+//     distances[source] = 0;
+
+//     long long max_possible_bucket = weight_max * V;
+//     std::vector<std::list<long long>> buckets(weight_max + 1);
+//     buckets[0].push_back(source);
+
+//     for(long long i = 0; i <= weight_max; i++)
+//     {
+//         while(!buckets[i].empty()) 
+//         {
+//             long long u = buckets[i].front();
+//             buckets[i].pop_front();
+
+//             for (const auto& edge : list[u]) 
+//             {
+//                 long long v = edge.first;
+//                 long long weight = edge.second;
+
+//                 if (distances[u] + weight < distances[v]) 
+//                 {
+//                     distances[v] = distances[u] + weight;
+//                     buckets[std::min(weight_max, distances[v])].push_back(v);
+//                 }
+//             }
+//         }
+//     }
+//     return distances;
+// }
 
 std::vector<long long> Graph::dial(int source)
 {
@@ -87,69 +117,55 @@ std::vector<long long> Graph::dial(int source)
     assert(max_possible_bucket >= 1);
 
     std::unordered_map<long long, std::vector<int>> buckets;
-    // buckets.reserve(max_possible_bucket + 1);
 
     std::vector<long long> distances (V + 1, std::numeric_limits<long long>::max());
-    std::vector<bool> visited_buckets (V + 1, false);
+    std::vector<bool> visited_nodes (V + 1, false);
 
     distances.at(source) = 0;
-    visited_buckets.at(source) = true;
-    buckets[0].push_back(source);
+    visited_nodes.at(source) = true;
+    buckets[0].push_back(source);   
 
-    int bucket_index = 0;
+    long long bucket_index = 0;
     while (!buckets.empty()) 
     {
         // Find the next non-empty bucket
-        while (buckets[bucket_index].empty() && bucket_index < max_possible_bucket) 
-        {
+        while (bucket_index < weight_max && buckets.find(bucket_index) == buckets.end()) {
             bucket_index++;
         }
-        if (bucket_index >= max_possible_bucket) break;
+        // while (bucket_index < max_possible_bucket && buckets[bucket_index].empty()) 
+        // {
+        //     bucket_index++;
+        // }
+        if (bucket_index >= weight_max) break;
 
-        // std::vector<int> current_bucket = std::move(buckets[bucket_index]);
-        // buckets.erase(bucket_index);
-
-        for (int u : buckets.at(bucket_index))
+        for (int u : buckets[bucket_index])
         {
+            // if (visited_nodes.at(u)) continue;
+
+            // visited_nodes.at(u) = true;
+
             // if (distances.at(u) < bucket_index) continue;
-            if (visited_buckets.at(u)) continue;
 
-            visited_buckets.at(u) = true;
-
-            for (const std::pair<int, long long>& edge : list.at(u))
+            for (const auto& [v, weight] : list.at(u))
             {
-                long long new_distance = distances.at(u) + edge.second;
-                if (new_distance < distances.at(edge.first)) 
+                long long new_dist = distances.at(u) + weight;
+                assert(new_dist >= 0);
+
+                if (new_dist < distances.at(v)) 
                 {
-                    distances.at(edge.first) = new_distance;
-                    bucket_index = new_distance;
-                    buckets[new_distance].push_back(edge.first);
+                    distances.at(v) = new_dist;
+                    bucket_index = new_dist;
+                    buckets[std::min(weight_max, new_dist)].push_back(v);
                 }
             }
         }
 
-        buckets.erase(bucket_index);
-
-        // for (int u : current_bucket) 
-        // {
-        //     if (distances[u] < bucket_index) continue; // Skip stale entries
-
-        //     for (const auto& [v, weight] : list[u]) 
-        //     {
-        //         long long new_distance = distances[u] + weight;
-        //         assert(new_distance >= 1);
-
-        //         if (new_distance < distances[v]) 
-        //         {
-        //             distances[v] = new_distance;
-        //             buckets[new_distance].push_back(v);
-        //         }
-        //     }
-        // }
+        buckets.erase(bucket_index); 
     }
 
     return distances;
 }
+
 
 std::vector<long long> Graph::radix(int source)
 {
@@ -157,31 +173,33 @@ std::vector<long long> Graph::radix(int source)
         throw std::out_of_range("Source node out of bounds");
 
     RadixHeap heap;
-    std::vector<long long> dist (V + 1, std::numeric_limits<long long>::max());
+    std::vector<long long> distances (V + 1, std::numeric_limits<long long>::max());
 
-    dist.at(source) = 0;
+    distances.at(source) = 0;
     heap.push(0, source);
 
     while (!heap.empty()) 
     {
-        auto [current_dist, current_node] = heap.pop();
+        auto [dist, u] = heap.pop();
 
-        assert(current_node <= V);
+        assert(u < V + 1);
+        assert(dist >= 0);
 
-        if (current_dist > dist.at(current_node)) continue;
+        if (dist > distances.at(u)) continue;
 
-        for (const auto& [neighbor, weight] : list.at(current_node))
+        for (const auto& [v, weight] : list.at(u))
         {
-            long long new_dist = current_dist + (long long)weight;
-            assert(new_dist >= 1);
+            long long new_dist = dist + weight;
+            assert(new_dist >= 0);
+            assert(v < V + 1);
 
-            if (new_dist < dist.at(neighbor)) 
+            if (new_dist < distances.at(v)) 
             {
-                dist.at(neighbor) = new_dist;
-                heap.push(new_dist, neighbor);
+                distances.at(v) = new_dist;
+                heap.push(new_dist, v);
             }
         }
     }
 
-    return dist;
+    return distances;
 }

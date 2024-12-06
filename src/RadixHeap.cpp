@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cassert>
 #include <iostream>
 
 RadixHeap::RadixHeap()
@@ -41,7 +42,7 @@ std::pair<long long, int> RadixHeap::pop()
 
 int RadixHeap::find_bucket(long long key) 
 {
-    return key == last_extracted ? 0 : bits - 1 - __builtin_clz(key ^ last_extracted);
+    return key == last_extracted ? 0 : bits - __builtin_clz(key ^ last_extracted);
 }
 
 void RadixHeap::refill() 
@@ -52,19 +53,21 @@ void RadixHeap::refill()
         ++i;
     }
 
+    std::vector<std::pair<long long, int>> temp = std::move(buckets.at(i));
     long long new_min = std::numeric_limits<long long>::max();
-    for (const auto& kv : buckets.at(i)) 
+
+    for (const auto& pair : temp) 
     {
-        new_min = std::min(new_min, kv.first);
+        new_min = std::min(new_min, pair.first); // Find the smallest key
     }
+
+    buckets[i].clear();
 
     last_extracted = new_min;
 
-    for (auto& kv : buckets.at(i)) 
+    for (const auto& [key, value] : temp) 
     {
-        int bucket_index = find_bucket(kv.first);
-        buckets[bucket_index].emplace_back(kv);
+        int bucket_index = find_bucket(key);
+        buckets[bucket_index].emplace_back(key, value);
     }
-
-    buckets.at(i).clear();
 }
