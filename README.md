@@ -1,11 +1,11 @@
-***Algorytmy najkrótszej ścieżki***
+**Algorytmy najkrótszej ścieżki**
 Ten projekt implementuje trzy różne algorytmy do znajdowania najkrótszych ścieżek w grafie. Implementacja została napisana w języku C++ i jest uruchamiana przy użyciu pliku Makefile.
 
-***Reprezentacja grafu:***
+**Reprezentacja grafu:**
 Klasa Graph obsługuje grafy skierowane i nieskierowane.
 Grafy są reprezentowane za pomocą list sąsiedztwa, co zapewnia efektywne przetwarzanie i oszczędność pamięci.
 
-***Zaimplementowane algorytmy:***
+**Zaimplementowane algorytmy:**
 Algorytm Dijkstry:
 Standardowa implementacja z wykorzystaniem kolejki priorytetowej.
 
@@ -15,7 +15,7 @@ Wykorzystuje listę kubełkową do wyznaczania ścieżek.
 Dijkstra oparty na Radix Heap:
 Wykorzystuje strukturę radix heap, co przyspiesza operacje na kolejce priorytetowej.
 
-***Wczytywanie grafu:***
+**Wczytywanie grafu:**
 Obsługuje wczytywanie grafu z odpowiednio sformatowanego pliku tekstowego.
 Obsługuje wczytywanie problemu do rozwiązania z odpowiednio sformatowanego pliku tekstowego.
 
