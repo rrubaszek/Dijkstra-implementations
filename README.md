@@ -21,8 +21,11 @@ Obsługuje wczytywanie problemu do rozwiązania z odpowiednio sformatowanego pli
 
 Makefile: Kompilacja projektu.
 make stworzy folder build oraz trzy pliki wyjściowe (dijkstra, dial, radixheap)
+
 Przykładowe uruchomienie: ./dijkstra -d graph.gr -ss sources.ss -oss results.oss.res
+
 Plik sources.ss powinien zawierać zródła. W pliku results.oss.res zostaną wyświetlone wyniki algorytmu.
+
 Istnieje również opcja uruchomienia z flagą -p2p pairs.p2p -op2p results.op2p.res; Wówczas algorytm wyznaczy ścieżkę między parą wierzchołków.
 
 Wymagania:
