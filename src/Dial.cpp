@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
             t.reset();
             vec = graph.dial(p.first);
             time += t.time_elapsed();
-            out_file << "d " << p.first << " " << p.second << " " << vec.at(p.second) << "\n";
+            out_file << "d " << p.first << " " << p.second << " " << vec.at(p.second - 1) << "\n";
         }
 
         time = time / sources_dest.size();
