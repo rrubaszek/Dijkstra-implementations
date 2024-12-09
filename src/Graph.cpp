@@ -66,7 +66,7 @@ std::vector<long long> Graph::dijkstra(int source)
             if (dist + weight < distances.at(v)) 
             {
                 distances.at(v) = dist + weight;
-                assert(distances.at(v) > 0);
+                assert(distances.at(v) >= 0);
 
                 queue.emplace(distances.at(v), v);
             }
@@ -81,35 +81,54 @@ std::vector<long long> Graph::dial(int source)
     std::vector<long long> distances(V + 1, std::numeric_limits<long long>::max());
     distances[source] = 0;
 
-    //long long max_possible_bucket = weight_max * V;
-    std::vector<std::list<int>> buckets (weight_max, std::list<int>());
-    buckets[0].push_back(source);
+    std::vector<bool> visited(V + 1, false);
+    std::vector<std::list<int>> buckets ((weight_max + 1), std::list<int>());
+    buckets[0].push_back(source);   
 
-    int last;
-    for(int i = 0; i < weight_max; i++)
+    int i = 0;
+    while (true)
     {
+        while (buckets.at(i).empty())
+        {
+            i = (i + 1) % (weight_max + 1);
+        }
+
         while(!buckets[i].empty()) 
         {
             int u = buckets[i].front();
             buckets[i].pop_front();
 
+            visited.at(u) = true;
+
             for (const auto& [v, weight] : list.at(u)) 
             {
+                if (visited.at(v)) continue;
                 if (distances[u] + weight < distances.at(v)) 
                 {
-                    if(distances[v] < std::numeric_limits<long long>::max())
-                    {
-                        buckets[distances.at(v) % (weight_max)].remove(v);
-                    }
+                    buckets[distances.at(v) % (weight_max + 1)].remove(v);
                     distances.at(v) = distances.at(u) + weight;
-                    buckets[distances.at(v) % (weight_max)].push_back(v);
+                    buckets[distances.at(v) % (weight_max + 1)].push_back(v);
                 }
             }
-            last = u;
         }
+
+        buckets.at(i).clear();
+        i = (i + 1) % (weight_max + 1);
+       
+        bool exit = true;
+        for (int j = 1; j <= V; j++)
+        {
+            if (!visited.at(j))
+            {
+                exit = false;
+                break;
+            }
+        }
+
+        if (exit)
+            return distances;
     }
 
-    std::cout << distances.at(last) << " <- distance\n";
     return distances;
 }
 
